@@ -1,8 +1,9 @@
 class StudentNotes {
-    constructor() {
+   constructor() {
         this.currentSubject = null;
-        this.currentView = 'subjects'; // 'subjects' или 'files'
+        this.currentView = 'subjects';
         this.currentFilter = 'all';
+        this.currentMaterialType = null; // 'lecture' или 'homework'
         this.init();
     }
 
@@ -165,6 +166,7 @@ class StudentNotes {
     showMaterial(index) {
         const subject = appData.subjects[this.currentSubject];
         const material = subject.materials[index];
+        this.currentMaterialType = material.type;
         
         const contentArea = document.getElementById('content-area');
         contentArea.innerHTML = `
@@ -172,16 +174,53 @@ class StudentNotes {
                 <div class="material-header">
                     <h3>${material.title}</h3>
                     <span class="material-type-badge">
-                        ${material.type === 'lecture' ? 'Лекция' : 'Домашняя работа'}
+                        ${material.type === 'lecture' ? '📖 Лекция' : '📝 Домашняя работа'}
                     </span>
                 </div>
                 <div class="material-date">Дата: ${new Date(material.date).toLocaleDateString('ru-RU')}</div>
                 <div class="material-text">${material.content.replace(/\n/g, '<br>')}</div>
-                <button onclick="studentNotes.backToMaterials()" style="margin-top: 2rem;">
+                
+                <div class="material-navigation">
+                    ${this.getNavigationButtons(subject, index)}
+                </div>
+                
+                <button onclick="studentNotes.backToMaterials()" class="back-btn">
                     ← Назад к материалам
                 </button>
             </div>
         `;
+    }
+
+getNavigationButtons(subject, currentIndex) {
+        const materials = subject.materials;
+        let buttons = '';
+        
+        // Находим связанные материалы (лекция ↔ ДЗ)
+        const currentMaterial = materials[currentIndex];
+        const relatedMaterials = materials.filter((material, index) => 
+            material.id !== currentMaterial.id && 
+            material.id.includes(currentMaterial.id.split('-').slice(0, -1).join('-'))
+        );
+
+        if (relatedMaterials.length > 0) {
+            buttons = '<div class="related-materials">';
+            
+            relatedMaterials.forEach(relatedMaterial => {
+                const relatedIndex = materials.findIndex(m => m.id === relatedMaterial.id);
+                const buttonText = relatedMaterial.type === 'lecture' ? 
+                    '📖 Перейти к лекции' : '📝 Перейти к ДЗ';
+                
+                buttons += `
+                    <button onclick="studentNotes.showMaterial(${relatedIndex})" class="nav-btn">
+                        ${buttonText}
+                    </button>
+                `;
+            });
+            
+            buttons += '</div>';
+        }
+
+        return buttons;
     }
 
     backToMaterials() {
