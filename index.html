@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заметки студента</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>📚 Заметки студента</h1>
+        <button id="notification-btn">🔔 Включить уведомления</button>
+    </header>
+
+    <main>
+        <aside class="sidebar">
+            <h2>Предметы</h2>
+            <ul id="subjects"></ul>
+            
+            <div class="sidebar-section">
+                <h2>Материалы</h2>
+                <button id="show-files">📁 Файлы для скачивания</button>
+            </div>
+        </aside>
+
+        <section class="content">
+            <div class="content-header">
+                <h2 id="current-section">Лекции и ДЗ</h2>
+                <div id="material-types">
+                    <button class="type-btn active" data-type="all">Все</button>
+                    <button class="type-btn" data-type="lecture">Лекции</button>
+                    <button class="type-btn" data-type="homework">ДЗ</button>
+                </div>
+            </div>
+            
+            <div class="content-area" id="content-area">
+                <!-- Здесь будет меняться контент -->
+            </div>
+        </section>
+    </main>
+
+    <div id="update-notification" class="update-notification">
+        <span>🎉 Доступны новые материалы!</span>
+        <button onclick="location.reload()">Обновить</button>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
