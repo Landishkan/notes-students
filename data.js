@@ -96,14 +96,13 @@ function greet(name) {
        
     ],
      materials: [
-        {
+       {
             id: 'math-formulas',
             type: 'file',
-            title: 'Пока пусто',
+            title: 'Учебник по правовому обеспечению',
             description: '',
-            file: 'files/math_formulas.pdf',
-            date: '2024-01-10',
-            size: '2.3 MB'
+            file: 'pravovye_osnovy.pdf',
+            date: '01-09-2025',
         },
         {
             id: 'physics-lab',
@@ -164,4 +163,5 @@ function showUpdateNotification(message) {
             tag: 'update'
         });
     }
+
 }
