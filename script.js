@@ -1,9 +1,9 @@
 class StudentNotes {
-   constructor() {
+    constructor() {
         this.currentSubject = null;
         this.currentView = 'subjects';
         this.currentFilter = 'all';
-        this.currentMaterialType = null; // 'lecture' или 'homework'
+        this.currentMaterialType = null;
         this.init();
     }
 
@@ -12,7 +12,10 @@ class StudentNotes {
         this.renderSubjects();
         this.setupNotificationPermission();
         
-        setTimeout(() => checkForUpdates(), 3000);
+        // Запускаем проверку обновлений
+        if (window.notificationManager) {
+            setTimeout(() => window.notificationManager.checkForUpdates(), 3000);
+        }
     }
 
     setupNotificationPermission() {
@@ -178,7 +181,7 @@ class StudentNotes {
                     </span>
                 </div>
                 <div class="material-date">Дата: ${new Date(material.date).toLocaleDateString('ru-RU')}</div>
-                <div class="material-text">${material.content.replace(/\n/g, '<br>')}</div>
+                <div class="material-text">${this.formatMaterialContent(material.content)}</div>
                 
                 <div class="material-navigation">
                     ${this.getNavigationButtons(subject, index)}
@@ -189,6 +192,61 @@ class StudentNotes {
                 </button>
             </div>
         `;
+    }
+
+    formatMaterialContent(content) {
+        // Обрабатываем специальные теги для изображений
+        return content
+            .replace(/\[img:(.+?)\]/g, '<div class="material-image"><img src="$1" alt="Изображение" onclick="studentNotes.openImageModal(\'$1\')"></div>')
+            .replace(/\[img-left:(.+?)\]/g, '<div class="material-image left"><img src="$1" alt="Изображение" onclick="studentNotes.openImageModal(\'$1\')"></div>')
+            .replace(/\[img-right:(.+?)\]/g, '<div class="material-image right"><img src="$1" alt="Изображение" onclick="studentNotes.openImageModal(\'$1\')"></div>')
+            .replace(/\n/g, '<br>')
+            .replace(/\[b:(.+?)\]/g, '<strong>$1</strong>')
+            .replace(/\[i:(.+?)\]/g, '<em>$1</em>')
+            .replace(/\[u:(.+?)\]/g, '<u>$1</u>')
+            .replace(/\[center:(.+?)\]/g, '<div style="text-align: center;">$1</div>');
+    }
+
+    openImageModal(src) {
+        // Создаем модальное окно для просмотра изображения
+        const modal = document.createElement('div');
+        modal.style = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            cursor: pointer;
+        `;
+        modal.innerHTML = `
+            <div style="max-width: 90%; max-height: 90%;">
+                <img src="${src}" style="max-width: 100%; max-height: 100%; border-radius: 5px;">
+            </div>
+            <button style="
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                background: #ff6b6b;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            " onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+        
+        document.body.appendChild(modal);
     }
 
 getNavigationButtons(subject, currentIndex) {
